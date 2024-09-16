@@ -21,7 +21,7 @@ pub struct PlotMemory {
     pub hidden_items: ahash::HashSet<String>,
 
     /// The transform from last frame.
-    pub(crate) transform: PlotTransform,
+    pub transform: PlotTransform,
 
     /// Allows to remember the first click position when performing a boxed zoom
     pub(crate) last_click_pos_for_zoom: Option<Pos2>,
@@ -35,16 +35,6 @@ pub struct PlotMemory {
 }
 
 impl PlotMemory {
-    #[inline]
-    pub fn transform(&self) -> PlotTransform {
-        self.transform
-    }
-
-    #[inline]
-    pub fn set_transform(&mut self, t: PlotTransform) {
-        self.transform = t;
-    }
-
     /// Plot-space bounds.
     #[inline]
     pub fn bounds(&self) -> &PlotBounds {
