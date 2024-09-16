@@ -34,7 +34,7 @@ impl PlotUi {
     /// further specified in the plot builder, this will return bounds centered on the origin. The bounds do
     /// not change until the plot is drawn.
     pub fn plot_bounds(&self) -> PlotBounds {
-        *self.last_plot_transform.bounds()
+        self.last_plot_transform.bounds
     }
 
     /// Set the plot bounds. Can be useful for implementing alternative plot navigation methods.

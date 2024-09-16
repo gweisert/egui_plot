@@ -48,13 +48,13 @@ impl PlotMemory {
     /// Plot-space bounds.
     #[inline]
     pub fn bounds(&self) -> &PlotBounds {
-        self.transform.bounds()
+        &self.transform.bounds
     }
 
     /// Plot-space bounds.
     #[inline]
     pub fn set_bounds(&mut self, bounds: PlotBounds) {
-        self.transform.set_bounds(bounds);
+        self.transform.bounds = bounds;
     }
 }
 

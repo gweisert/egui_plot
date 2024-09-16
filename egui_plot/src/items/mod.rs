@@ -224,10 +224,10 @@ impl PlotItem for HLine {
         // Round to minimize aliasing:
         let points = vec![
             ui.painter().round_pos_to_pixels(
-                transform.position_from_point(&PlotPoint::new(transform.bounds().min[0], *y)),
+                transform.position_from_point(&PlotPoint::new(transform.bounds.min[0], *y)),
             ),
             ui.painter().round_pos_to_pixels(
-                transform.position_from_point(&PlotPoint::new(transform.bounds().max[0], *y)),
+                transform.position_from_point(&PlotPoint::new(transform.bounds.max[0], *y)),
             ),
         ];
         style.style_line(points, *stroke, *highlight, shapes);
@@ -372,10 +372,10 @@ impl PlotItem for VLine {
         // Round to minimize aliasing:
         let points = vec![
             ui.painter().round_pos_to_pixels(
-                transform.position_from_point(&PlotPoint::new(*x, transform.bounds().min[1])),
+                transform.position_from_point(&PlotPoint::new(*x, transform.bounds.min[1])),
             ),
             ui.painter().round_pos_to_pixels(
-                transform.position_from_point(&PlotPoint::new(*x, transform.bounds().max[1])),
+                transform.position_from_point(&PlotPoint::new(*x, transform.bounds.max[1])),
             ),
         ];
         style.style_line(points, *stroke, *highlight, shapes);

@@ -272,7 +272,7 @@ pub struct PlotTransform {
     frame: Rect,
 
     /// The plot bounds.
-    bounds: PlotBounds,
+    pub bounds: PlotBounds,
 
     /// Whether to always center the x-range of the bounds.
     x_centered: bool,
@@ -349,17 +349,6 @@ impl PlotTransform {
     #[inline]
     pub fn frame(&self) -> &Rect {
         &self.frame
-    }
-
-    /// Plot-space bounds.
-    #[inline]
-    pub fn bounds(&self) -> &PlotBounds {
-        &self.bounds
-    }
-
-    #[inline]
-    pub fn set_bounds(&mut self, bounds: PlotBounds) {
-        self.bounds = bounds;
     }
 
     pub fn translate_bounds(&mut self, mut delta_pos: (f64, f64)) {

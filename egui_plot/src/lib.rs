@@ -913,7 +913,7 @@ impl<'a> Plot<'a> {
         items.sort_by_key(|item| item.highlighted());
 
         // --- Bound computation ---
-        let mut bounds = *last_plot_transform.bounds();
+        let mut bounds = last_plot_transform.bounds;
 
         // Find the cursors from other plots we need to draw
         let draw_cursors: Vec<Cursor> = if let Some((id, _)) = linked_cursors.as_ref() {
@@ -1095,7 +1095,7 @@ impl<'a> Plot<'a> {
                         ],
                     };
                     if new_bounds.is_valid() {
-                        mem.transform.set_bounds(new_bounds);
+                        mem.transform.bounds = new_bounds;
                         mem.auto_bounds = false.into();
                     }
                     // reset the boxed zoom state
@@ -1147,7 +1147,7 @@ impl<'a> Plot<'a> {
         // --- transform initialized
 
         // Add legend widgets to plot
-        let bounds = mem.transform.bounds();
+        let bounds = mem.transform.bounds;
         let x_axis_range = bounds.range_x();
         let x_steps = Arc::new({
             let input = GridInput {
@@ -1181,7 +1181,7 @@ impl<'a> Plot<'a> {
 
         // Initialize values from functions.
         for item in &mut items {
-            item.initialize(mem.transform.bounds().range_x());
+            item.initialize(mem.transform.bounds.range_x());
         }
 
         let prepared = PreparedPlot {
@@ -1237,7 +1237,7 @@ impl<'a> Plot<'a> {
                 link_groups.0.insert(
                     *id,
                     LinkedBounds {
-                        bounds: *mem.transform.bounds(),
+                        bounds: mem.transform.bounds,
                         auto_bounds: mem.auto_bounds,
                     },
                 );
@@ -1555,7 +1555,7 @@ impl<'a> PreparedPlot<'a> {
             if let Some(pointer) = hover_pos {
                 let font_id = TextStyle::Monospace.resolve(ui.style());
                 let coordinate = transform.value_from_position(pointer);
-                let text = formatter.format(&coordinate, transform.bounds());
+                let text = formatter.format(&coordinate, &transform.bounds);
                 let padded_frame = transform.frame().shrink(4.0);
                 let (anchor, position) = match corner {
                     Corner::LeftTop => (Align2::LEFT_TOP, padded_frame.left_top()),
@@ -1583,7 +1583,7 @@ impl<'a> PreparedPlot<'a> {
         let iaxis = usize::from(axis);
 
         // Where on the cross-dimension to show the label values
-        let bounds = transform.bounds();
+        let bounds = transform.bounds;
         let value_cross = 0.0_f64.clamp(bounds.min[1 - iaxis], bounds.max[1 - iaxis]);
 
         let input = GridInput {
