@@ -1163,6 +1163,54 @@ impl PlotItem for Points {
                         shapes.push(Shape::line_segment(diagonal1, default_stroke));
                         shapes.push(Shape::line_segment(diagonal2, default_stroke));
                     }
+                    MarkerShape::BracketLeft => {
+                        shapes.push(Shape::line(
+                            vec![tf(0.0, 1.0), tf(-1.0, 1.0), tf(-1.0, -1.0), tf(0.0, -1.0)],
+                            default_stroke,
+                        ));
+                    }
+                    MarkerShape::BracketRight => {
+                        shapes.push(Shape::line(
+                            vec![tf(0.0, 1.0), tf(1.0, 1.0), tf(1.0, -1.0), tf(0.0, -1.0)],
+                            default_stroke,
+                        ));
+                    }
+                    MarkerShape::AngleLeft => {
+                        shapes.push(Shape::line(
+                            vec![tf(0.0, 0.75), tf(-1.0, 0.0), tf(0.0, -0.75)],
+                            default_stroke,
+                        ));
+                    }
+                    MarkerShape::AngleRight => {
+                        shapes.push(Shape::line(
+                            vec![tf(0.0, 0.75), tf(1.0, 0.0), tf(0.0, -0.75)],
+                            default_stroke,
+                        ));
+                    }
+                    MarkerShape::CornerBottomLeft => {
+                        shapes.push(Shape::line(
+                            vec![tf(-1.0, 0.0), tf(-1.0, 1.0), tf(0.0, 1.0)],
+                            default_stroke,
+                        ));
+                    }
+                    MarkerShape::CornerBottomRight => {
+                        shapes.push(Shape::line(
+                            vec![tf(1.0, 0.0), tf(1.0, 1.0), tf(0.0, 1.0)],
+                            default_stroke,
+                        ));
+                    }
+                    MarkerShape::CornerTopLeft => {
+                        shapes.push(Shape::line(
+                            vec![tf(-1.0, 0.0), tf(-1.0, -1.0), tf(0.0, -1.0)],
+                            default_stroke,
+                        ));
+                    }
+                    MarkerShape::CornerTopRight => {
+                        shapes.push(Shape::line(
+                            vec![tf(1.0, 0.0), tf(1.0, -1.0), tf(0.0, -1.0)],
+                            default_stroke,
+                        ));
+                    }
                 }
             });
     }

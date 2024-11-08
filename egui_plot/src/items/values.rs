@@ -333,6 +333,14 @@ pub enum MarkerShape {
     Left,
     Right,
     Asterisk,
+    BracketLeft,
+    BracketRight,
+    AngleLeft,
+    AngleRight,
+    CornerBottomLeft,
+    CornerBottomRight,
+    CornerTopLeft,
+    CornerTopRight,
 }
 
 impl MarkerShape {
@@ -349,6 +357,14 @@ impl MarkerShape {
             Self::Left,
             Self::Right,
             Self::Asterisk,
+            Self::BracketLeft,
+            Self::BracketRight,
+            Self::AngleLeft,
+            Self::AngleRight,
+            Self::CornerBottomLeft,
+            Self::CornerBottomRight,
+            Self::CornerTopLeft,
+            Self::CornerTopRight,
         ]
         .iter()
         .copied()
