@@ -341,6 +341,7 @@ pub enum MarkerShape {
     CornerBottomRight,
     CornerTopLeft,
     CornerTopRight,
+    Letter(char),
 }
 
 impl MarkerShape {

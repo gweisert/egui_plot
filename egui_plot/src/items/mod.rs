@@ -1211,6 +1211,19 @@ impl PlotItem for Points {
                             default_stroke,
                         ));
                     }
+                    MarkerShape::Letter(c) => {
+                        let shape = _ui.fonts(|fonts| {
+                            Shape::text(
+                                fonts,
+                                tf(0.0, 0.0),
+                                Align2::CENTER_CENTER,
+                                c,
+                                egui::FontId::new(radius * 2.0, egui::FontFamily::Monospace),
+                                *color,
+                            )
+                        });
+                        shapes.push(shape);
+                    }
                 }
             });
     }
