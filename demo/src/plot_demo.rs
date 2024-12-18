@@ -504,7 +504,7 @@ impl CustomAxesDemo {
     }
 
     #[allow(clippy::unused_self)]
-    fn ui(&mut self, ui: &mut egui::Ui) -> Response {
+    fn ui(&self, ui: &mut egui::Ui) -> Response {
         const MINS_PER_DAY: f64 = CustomAxesDemo::MINS_PER_DAY;
         const MINS_PER_H: f64 = CustomAxesDemo::MINS_PER_H;
 
@@ -563,6 +563,10 @@ impl CustomAxesDemo {
         ui.label("Zoom in on the X-axis to see hours and minutes");
 
         let x_axes = vec![
+            AxisHints::new_x()
+                .label("Time")
+                .formatter(time_formatter)
+                .placement(egui_plot::VPlacement::Top),
             AxisHints::new_x().label("Time").formatter(time_formatter),
             AxisHints::new_x().label("Value"),
         ];
@@ -768,7 +772,7 @@ struct InteractionDemo {}
 
 impl InteractionDemo {
     #[allow(clippy::unused_self)]
-    fn ui(&mut self, ui: &mut egui::Ui) -> Response {
+    fn ui(&self, ui: &mut egui::Ui) -> Response {
         let id = ui.make_persistent_id("interaction_demo");
 
         // This demonstrates how to read info about the plot _before_ showing it:
