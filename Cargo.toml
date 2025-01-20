@@ -40,10 +40,10 @@ wasm-bindgen-futures = "0.4"
 web-sys = "0.3.70"
 
 
-[patch.crates-io]
-eframe = { git = "https://github.com/emilk/egui", rev = "f0d7c74e838b8e8920a22e7515990fbe057ec218" }   # egui master 2025-01-08
-egui = { git = "https://github.com/emilk/egui", rev = "f0d7c74e838b8e8920a22e7515990fbe057ec218" }     # egui master 2025-01-08
-emath = { git = "https://github.com/emilk/egui", rev = "f0d7c74e838b8e8920a22e7515990fbe057ec218" }    # egui master 2025-01-08
+# [patch.crates-io]
+# eframe = { git = "https://github.com/emilk/egui", rev = "f0d7c74e838b8e8920a22e7515990fbe057ec218" }   # egui master 2025-01-08
+# egui = { git = "https://github.com/emilk/egui", rev = "f0d7c74e838b8e8920a22e7515990fbe057ec218" }     # egui master 2025-01-08
+# emath = { git = "https://github.com/emilk/egui", rev = "f0d7c74e838b8e8920a22e7515990fbe057ec218" }    # egui master 2025-01-08
 
 # If you want to use the bleeding edge version of egui and eframe:
 # egui = { git = "https://github.com/emilk/egui", branch = "master" }

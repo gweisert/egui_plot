@@ -881,7 +881,7 @@ impl<'a> Plot<'a> {
                 .with_clip_rect(plot_rect)
                 .add(epaint::RectShape::new(
                     plot_rect,
-                    Rounding::same(2),
+                    Rounding::same(2.0),
                     ui.visuals().extreme_bg_color,
                     ui.visuals().widgets.noninteractive.bg_stroke,
                 ));
