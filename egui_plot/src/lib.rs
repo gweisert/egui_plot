@@ -180,13 +180,13 @@ pub struct Plot<'a> {
     x_axes: Vec<AxisHints<'a>>, // default x axes
     y_axes: Vec<AxisHints<'a>>, // default y axes
     legend_config: Option<Legend>,
+    cursor_color: Option<Color32>,
     show_background: bool,
     show_axes: Vec2b,
 
     show_grid: Vec2b,
     grid_spacing: Rangef,
     grid_spacers: [GridSpacer<'a>; 2],
-    sharp_grid_lines: bool,
     clamp_grid: bool,
 
     sense: Sense,
@@ -227,13 +227,13 @@ impl<'a> Plot<'a> {
             x_axes: vec![AxisHints::new(Axis::X)],
             y_axes: vec![AxisHints::new(Axis::Y)],
             legend_config: None,
+            cursor_color: None,
             show_background: true,
             show_axes: true.into(),
 
             show_grid: true.into(),
             grid_spacing: Rangef::new(8.0, 300.0),
             grid_spacers: [log_grid_spacer(10), log_grid_spacer(10)],
-            sharp_grid_lines: true,
             clamp_grid: false,
 
             sense: egui::Sense::click_and_drag(),
@@ -595,8 +595,8 @@ impl<'a> Plot<'a> {
     /// Round grid positions to full pixels to avoid aliasing. Improves plot appearance but might have an
     /// undesired effect when shifting the plot bounds. Enabled by default.
     #[inline]
-    pub fn sharp_grid_lines(mut self, enabled: bool) -> Self {
-        self.sharp_grid_lines = enabled;
+    #[deprecated = "This no longer has any effect and is always enabled."]
+    pub fn sharp_grid_lines(self, _enabled: bool) -> Self {
         self
     }
 
@@ -713,6 +713,15 @@ impl<'a> Plot<'a> {
         self
     }
 
+    /// Set custom cursor color.
+    ///
+    /// You may set the color to [`Color32::TRANSPARENT`] to hide the cursors.
+    #[inline]
+    pub fn cursor_color(mut self, color: Color32) -> Self {
+        self.cursor_color = Some(color);
+        self
+    }
+
     /// Interact with and add items to the plot and finally draw it.
     pub fn show<R>(
         self,
@@ -754,6 +763,7 @@ impl<'a> Plot<'a> {
             x_axes,
             y_axes,
             legend_config,
+            cursor_color,
             reset,
             show_background,
             show_axes,
@@ -764,7 +774,6 @@ impl<'a> Plot<'a> {
 
             clamp_grid,
             grid_spacers,
-            sharp_grid_lines,
             sense,
         } = self;
 
@@ -872,7 +881,7 @@ impl<'a> Plot<'a> {
                 .with_clip_rect(plot_rect)
                 .add(epaint::RectShape::new(
                     plot_rect,
-                    Rounding::same(2.0),
+                    Rounding::same(2),
                     ui.visuals().extreme_bg_color,
                     ui.visuals().widgets.noninteractive.bg_stroke,
                 ));
@@ -1094,7 +1103,7 @@ impl<'a> Plot<'a> {
         // For instance: The user is painting another interactive widget on top of the plot
         // but they still want to be able to pan/zoom the plot.
         if let (true, Some(hover_pos)) = (
-            response.contains_pointer,
+            response.contains_pointer(),
             ui.input(|i| i.pointer.hover_pos()),
         ) {
             if allow_zoom.any() {
@@ -1182,8 +1191,8 @@ impl<'a> Plot<'a> {
             draw_cursor_x: linked_cursors.as_ref().map_or(false, |group| group.1.x),
             draw_cursor_y: linked_cursors.as_ref().map_or(false, |group| group.1.y),
             draw_cursors,
+            cursor_color,
             grid_spacers,
-            sharp_grid_lines,
             clamp_grid,
         };
 
@@ -1343,6 +1352,12 @@ fn axis_widgets<'a>(
         }
     }
 
+    // The loops iterated through {x,y}_axes in reverse order, so we have to reverse the
+    // {x,y}_axis_widgets vec as well. Otherwise, the indices are messed up and the plot memory
+    // (mem.{x,y}_axis_thickness) will access the wrong axis given an index.
+    x_axis_widgets.reverse();
+    y_axis_widgets.reverse();
+
     let mut plot_rect = rect_left;
 
     // If too little space, remove axis widgets
@@ -1466,8 +1481,8 @@ struct PreparedPlot<'a> {
     draw_cursor_x: bool,
     draw_cursor_y: bool,
     draw_cursors: Vec<Cursor>,
+    cursor_color: Option<Color32>,
 
-    sharp_grid_lines: bool,
     clamp_grid: bool,
 }
 
@@ -1507,7 +1522,7 @@ impl<'a> PreparedPlot<'a> {
         };
 
         // Draw cursors
-        let line_color = rulers_color(ui);
+        let line_color = self.cursor_color.unwrap_or_else(|| rulers_color(ui));
 
         let mut draw_cursor = |cursors: &Vec<Cursor>, always| {
             for &cursor in cursors {
@@ -1642,12 +1657,6 @@ impl<'a> PreparedPlot<'a> {
                         p1.x = transform.position_from_point_x(clamp_range.max[0]);
                     }
                 }
-            }
-
-            if self.sharp_grid_lines {
-                // Round to avoid aliasing
-                p0 = ui.painter().round_pos_to_pixels(p0);
-                p1 = ui.painter().round_pos_to_pixels(p1);
             }
 
             shapes.push((
