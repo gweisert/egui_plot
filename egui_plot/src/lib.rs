@@ -20,8 +20,7 @@ use std::{cmp::Ordering, ops::RangeInclusive, sync::Arc};
 use ahash::HashMap;
 use egui::{
     epaint, remap_clamp, vec2, Align2, Color32, CursorIcon, Id, Layout, NumExt, PointerButton,
-    Pos2, Rangef, Rect, Response, Rounding, Sense, Shape, Stroke, TextStyle, Ui, Vec2, Vec2b,
-    WidgetText,
+    Pos2, Rangef, Rect, Response, Sense, Shape, Stroke, TextStyle, Ui, Vec2, Vec2b, WidgetText,
 };
 use emath::Float as _;
 
@@ -32,7 +31,7 @@ pub use crate::{
         MarkerShape, Orientation, PlotConfig, PlotGeometry, PlotImage, PlotItem, PlotPoint,
         PlotPoints, Points, Polygon, Text, VLine,
     },
-    legend::{Corner, Legend},
+    legend::{ColorConflictHandling, Corner, Legend},
     memory::PlotMemory,
     plot_ui::PlotUi,
     transform::{PlotBounds, PlotTransform},
@@ -520,8 +519,8 @@ impl<'a> Plot<'a> {
     ///
     /// This is enabled by default.
     #[inline]
-    pub fn auto_bounds(mut self, auto_bounds: Vec2b) -> Self {
-        self.default_auto_bounds = auto_bounds;
+    pub fn auto_bounds(mut self, auto_bounds: impl Into<Vec2b>) -> Self {
+        self.default_auto_bounds = auto_bounds.into();
         self
     }
 
@@ -587,8 +586,8 @@ impl<'a> Plot<'a> {
     /// Add this plot to a cursor link group so that this plot will share the cursor position with other plots
     /// in the same group. A plot cannot belong to more than one cursor group.
     #[inline]
-    pub fn link_cursor(mut self, group_id: impl Into<Id>, link: Vec2b) -> Self {
-        self.linked_cursors = Some((group_id.into(), link));
+    pub fn link_cursor(mut self, group_id: impl Into<Id>, link: impl Into<Vec2b>) -> Self {
+        self.linked_cursors = Some((group_id.into(), link.into()));
         self
     }
 
@@ -723,20 +722,20 @@ impl<'a> Plot<'a> {
     }
 
     /// Interact with and add items to the plot and finally draw it.
-    pub fn show<R>(
+    pub fn show<'b, R>(
         self,
         ui: &mut Ui,
-        build_fn: impl FnOnce(&mut PlotUi) -> R + 'a,
+        build_fn: impl FnOnce(&mut PlotUi<'b>) -> R + 'a,
     ) -> PlotResponse<R> {
         self.show_dyn(ui, Box::new(build_fn))
     }
 
     #[allow(clippy::too_many_lines)] // TODO(emilk): shorten this function
     #[allow(clippy::type_complexity)] // build_fn
-    fn show_dyn<R>(
+    fn show_dyn<'b, R>(
         self,
         ui: &mut Ui,
-        build_fn: Box<dyn FnOnce(&mut PlotUi) -> R + 'a>,
+        build_fn: Box<dyn FnOnce(&mut PlotUi<'b>) -> R + 'a>,
     ) -> PlotResponse<R> {
         let Self {
             id_source,
@@ -881,9 +880,10 @@ impl<'a> Plot<'a> {
                 .with_clip_rect(plot_rect)
                 .add(epaint::RectShape::new(
                     plot_rect,
-                    Rounding::same(2.0),
+                    2,
                     ui.visuals().extreme_bg_color,
                     ui.visuals().widgets.noninteractive.bg_stroke,
+                    egui::StrokeKind::Inside,
                 ));
         }
 
@@ -1067,11 +1067,13 @@ impl<'a> Plot<'a> {
                             rect,
                             0.0,
                             epaint::Stroke::new(4., Color32::DARK_BLUE),
+                            egui::StrokeKind::Middle,
                         ), // Outer stroke
                         epaint::RectShape::stroke(
                             rect,
                             0.0,
                             epaint::Stroke::new(2., Color32::WHITE),
+                            egui::StrokeKind::Middle,
                         ), // Inner stroke
                     ));
                 }
@@ -1262,7 +1264,7 @@ impl<'a> Plot<'a> {
 /// Returns the rect left after adding axes.
 fn axis_widgets<'a>(
     mem: Option<&PlotMemory>,
-    show_axes: Vec2b,
+    show_axes: impl Into<Vec2b>,
     complete_rect: Rect,
     [x_axes, y_axes]: [&'a [AxisHints<'a>]; 2],
 ) -> ([Vec<AxisWidget<'a>>; 2], Rect) {
@@ -1288,6 +1290,7 @@ fn axis_widgets<'a>(
     //      |      X-axis 1      |   |
     //  +   +--------------------+---+
     //
+    let show_axes = show_axes.into();
 
     let mut x_axis_widgets = Vec::<AxisWidget<'_>>::new();
     let mut y_axis_widgets = Vec::<AxisWidget<'_>>::new();
@@ -1468,7 +1471,7 @@ pub fn uniform_grid_spacer<'a>(spacer: impl Fn(GridInput) -> [f64; 3] + 'a) -> G
 // ----------------------------------------------------------------------------
 
 struct PreparedPlot<'a> {
-    items: Vec<Box<dyn PlotItem>>,
+    items: Vec<Box<dyn PlotItem + 'a>>,
     show_x: bool,
     show_y: bool,
     label_formatter: LabelFormatter<'a>,
