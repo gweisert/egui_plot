@@ -556,7 +556,7 @@ impl<'a> PlotItem for Line<'a> {
                 .multiply(fill_alpha)
                 .into();
             let mut mesh = Mesh::default();
-            let expected_intersections = 20;
+            let expected_intersections = 20;    
             mesh.reserve_triangles((n_values - 1) * 2);
             mesh.reserve_vertices(n_values * 2 + expected_intersections);
             values_tf.windows(2).for_each(|w| {

@@ -107,6 +107,7 @@ pub struct AxisHints<'a> {
     pub(super) min_thickness: f32,
     pub(super) placement: Placement,
     pub(super) label_spacing: Rangef,
+    pub(super) label_gap: Vec2,
 }
 
 // TODO(JohannesProgrammiert): this just a guess. It might cease to work if a user changes font size.
@@ -137,6 +138,7 @@ impl<'a> AxisHints<'a> {
                 Axis::X => Rangef::new(60.0, 80.0), // labels can get pretty wide
                 Axis::Y => Rangef::new(20.0, 30.0), // text isn't very high
             },
+            label_gap: Vec2::splat(AXIS_LABEL_GAP),
         }
     }
 
@@ -201,6 +203,13 @@ impl<'a> AxisHints<'a> {
     #[inline]
     pub fn label_spacing(mut self, range: impl Into<Rangef>) -> Self {
         self.label_spacing = range.into();
+        self
+    }
+
+    /// Set the gap between the axis label and the tick labels.
+    #[inline]
+    pub fn label_gap(mut self, gap: Vec2) -> Self {
+        self.label_gap = gap;
         self
     }
 
@@ -272,13 +281,13 @@ impl<'a> AxisWidget<'a> {
                     let pos = response.rect.center_bottom();
                     Pos2 {
                         x: pos.x - galley.size().x * 0.5,
-                        y: pos.y - galley.size().y * (1.0 + AXIS_LABEL_GAP),
+                        y: pos.y - galley.size().y * (1.0 + self.hints.label_gap.y),
                     }
                 }
                 Axis::Y => {
                     let pos = response.rect.left_center();
                     Pos2 {
-                        x: pos.x - galley.size().y * AXIS_LABEL_GAP,
+                        x: pos.x - galley.size().y * self.hints.label_gap.x,
                         y: pos.y + galley.size().x * 0.5,
                     }
                 }
@@ -288,13 +297,13 @@ impl<'a> AxisWidget<'a> {
                     let pos = response.rect.center_top();
                     Pos2 {
                         x: pos.x - galley.size().x * 0.5,
-                        y: pos.y + galley.size().y * AXIS_LABEL_GAP,
+                        y: pos.y + galley.size().y * self.hints.label_gap.y,
                     }
                 }
                 Axis::Y => {
                     let pos = response.rect.right_center();
                     Pos2 {
-                        x: pos.x - galley.size().y * (1.0 - AXIS_LABEL_GAP),
+                        x: pos.x - galley.size().y * (1.0 - self.hints.label_gap.x),
                         y: pos.y + galley.size().x * 0.5,
                     }
                 }
