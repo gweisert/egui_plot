@@ -491,7 +491,7 @@ impl<'a> PlotItem for Line<'a> {
                 .multiply(fill_alpha)
                 .into();
             let mut mesh = Mesh::default();
-            let expected_intersections = 20;    
+            let expected_intersections = 20;
             mesh.reserve_triangles((n_values - 1) * 2);
             mesh.reserve_vertices(n_values * 2 + expected_intersections);
             values_tf.windows(2).for_each(|w| {
@@ -995,6 +995,15 @@ impl<'a> PlotItem for Points<'a> {
                                 *color,
                             )
                         });
+                        shapes.push(shape);
+                    }
+                    MarkerShape::Image(texture_id) => {
+                        let shape = Shape::image(
+                            *texture_id,
+                            Rect::from_center_size(tf(0.0, 0.0), Vec2::splat(radius * 2.0)),
+                            Rect::from_min_size(Pos2::ZERO, Vec2::splat(1.0)),
+                            *color,
+                        );
                         shapes.push(shape);
                     }
                 }

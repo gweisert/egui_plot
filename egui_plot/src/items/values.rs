@@ -361,6 +361,7 @@ pub enum MarkerShape {
     CornerTopLeft,
     CornerTopRight,
     Letter(char),
+    Image(egui::TextureId)
 }
 
 impl MarkerShape {
