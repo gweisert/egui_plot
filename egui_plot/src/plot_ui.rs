@@ -1,4 +1,6 @@
-use egui::{epaint::Hsva, Color32, Pos2, Response, Vec2, Vec2b};
+use std::ops::RangeInclusive;
+
+use egui::{Color32, Pos2, Response, Vec2, Vec2b, epaint::Hsva};
 
 use crate::{BoundsModification, PlotBounds, PlotItem, PlotPoint, PlotTransform};
 
@@ -39,8 +41,20 @@ impl<'a> PlotUi<'a> {
 
     /// Set the plot bounds. Can be useful for implementing alternative plot navigation methods.
     pub fn set_plot_bounds(&mut self, plot_bounds: PlotBounds) {
+        self.set_plot_bounds_x(plot_bounds.range_x());
+        self.set_plot_bounds_y(plot_bounds.range_y());
+    }
+
+    /// Set the X bounds. Can be useful for implementing alternative plot navigation methods.
+    pub fn set_plot_bounds_x(&mut self, range: impl Into<RangeInclusive<f64>>) {
         self.bounds_modifications
-            .push(BoundsModification::Set(plot_bounds));
+            .push(BoundsModification::SetX(range.into()));
+    }
+
+    /// Set the Y bounds. Can be useful for implementing alternative plot navigation methods.
+    pub fn set_plot_bounds_y(&mut self, range: impl Into<RangeInclusive<f64>>) {
+        self.bounds_modifications
+            .push(BoundsModification::SetY(range.into()));
     }
 
     /// Move the plot bounds. Can be useful for implementing alternative plot navigation methods.
@@ -224,7 +238,7 @@ impl<'a> PlotUi<'a> {
         }
 
         // Give the elements an automatic color if no color has been assigned.
-        if box_plot.default_color == Color32::TRANSPARENT {
+        if PlotItem::color(&box_plot) == Color32::TRANSPARENT {
             box_plot = box_plot.color(self.auto_color());
         }
         self.items.push(Box::new(box_plot));
@@ -237,7 +251,7 @@ impl<'a> PlotUi<'a> {
         }
 
         // Give the elements an automatic color if no color has been assigned.
-        if chart.default_color == Color32::TRANSPARENT {
+        if PlotItem::color(&chart) == Color32::TRANSPARENT {
             chart = chart.color(self.auto_color());
         }
         self.items.push(Box::new(chart));
